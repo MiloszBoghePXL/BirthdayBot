@@ -33,7 +33,7 @@ client.on("message", async message => {
     }
 });
 
-function test(message){
+function test(message) {
     message.guild.members.fetch().then(fetchedMembers => {
         const totalOnline = fetchedMembers.filter(member => member.presence.status === 'online');
         // We now have a collection with all online member objects in the totalOnline variable
@@ -42,7 +42,17 @@ function test(message){
 }
 
 function set(message) {
+    message.channel.send("Hi, " + message.author.username + 'Please enter your birthday. (DD/MM)').then(() => {
+        const filter = m => message.author.id === m.author.id;
 
+        message.channel.awaitMessages(filter, {time: 60000, max: 1, errors: ['time']})
+            .then(messages => {
+                message.channel.send(`Birthday set: ${messages.first().content}`);
+            })
+            .catch(() => {
+                message.channel.send('You did not enter any input!');
+            });
+    });
 }
 
 function next(message) {
