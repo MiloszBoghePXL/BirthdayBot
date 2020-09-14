@@ -19,7 +19,8 @@ client.on("message", async message => {
                 break;
             case "profile":
                 if (command[2]) {
-
+                    let user = message.mentions.users.toJSON()[0];
+                    profile(embed,user,message.channel);
                 } else {
                     profile(embed, message.author, message.channel);
                 }
@@ -44,7 +45,7 @@ client.on("message", async message => {
 
 function showHelp(embed, channel) {
     embed.addFields(
-        {name: 'Bday profile', value: "Displays your own birthday profile."},
+        {name: 'Bday profile (@user optional)', value: "Displays someones birthday profile."},
         {name: 'Bday set', value: 'Allows you to set your own birthday.'},
         {name: 'Bday next', value: 'Shows the next upcoming birthday(s).'},
         {name: 'Bday list', value: 'Shows the list of users and their birthdays.'},
