@@ -1,5 +1,4 @@
 const Discord = require('discord.js');
-const config = require("./config.json");
 const client = new Discord.Client();
 const avatarUrl = "https://cdn.discordapp.com/avatars/";
 
@@ -89,4 +88,4 @@ function getAvatar(author) {
     return avatarUrl + author.id + "/" + author.avatar + ".png"
 }
 
-client.login(config.token);
+client.login(process.env.token);
