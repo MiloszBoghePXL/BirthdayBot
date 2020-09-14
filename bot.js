@@ -1,11 +1,11 @@
 const Discord = require('discord.js');
 const config = require("./config.json");
-
 const client = new Discord.Client();
+const avatarUrl = "https://cdn.discordapp.com/avatars/";
 
 client.on('ready', () => {
     console.log('I am ready!');
-    client.user.setActivity(`Serving Nunu :)`);
+    client.user.setActivity(`"Bday help" for info :)`);
 });
 
 
@@ -14,8 +14,14 @@ client.on("message", async message => {
     const embed = new Discord.MessageEmbed();
 
     switch (message.content.toLowerCase()) {
+        case "bday help":
+            showHelp(embed, message.channel);
+            break;
+        case "bday":
+            profile(embed, message);
+            break;
         case "testing":
-            embed.setTitle("test");
+            console.log(message.author);
             test(embed, message);
             break;
         case "bday set":
@@ -35,24 +41,28 @@ client.on("message", async message => {
     }
 });
 
-function test(embed, message) {
-        embed.setColor('#0099ff')
-        .setTitle('Some title')
-        .setURL('https://discord.js.org/')
-        .setAuthor(message.author.username, message.author.avatar)
-        .setDescription('Some description here')
-        .setThumbnail('https://i.imgur.com/wSTFkRM.png')
-        .addFields(
-            { name: 'Regular field title', value: 'Some value here' },
-            { name: '\u200B', value: '\u200B' },
-            { name: 'Inline field title', value: 'Some value here', inline: true },
-            { name: 'Inline field title', value: 'Some value here', inline: true },
-        )
-        .addField('Inline field title', 'Some value here', true)
-        .setImage('https://i.imgur.com/wSTFkRM.png')
-        .setTimestamp()
-        .setFooter('Some footer text here', 'https://i.imgur.com/wSTFkRM.png');
 
+function test(embed, message) {
+
+}
+
+function showHelp(embed,channel) {
+    embed.addFields(
+            {name: 'Bday profile', value: "Displays your own birthday profile."},
+            {name: 'Bday set', value: 'Allows you to set your own birthday.'},
+            {name: 'Bday next', value: 'Shows the next upcoming birthday(s).'},
+            {name: 'Bday list', value: 'Shows the list of users and their birthdays.'},
+        );
+    channel.send(embed);
+}
+
+function profile(embed, message){
+    embed.setThumbnail(getAvatar(message.author))
+        .addFields(
+            {name: 'Name', value: message.author.username},
+            {name: 'Birthday', value: 'something'},
+            {name: 'Days until next birthday', value: 'something'},
+        );
     message.channel.send(embed);
 }
 
@@ -80,6 +90,10 @@ function list(message) {
 
 function reset(message) {
 
+}
+
+function getAvatar(author) {
+    return avatarUrl + author.id + "/" + author.avatar + ".png"
 }
 
 client.login(config.token);
