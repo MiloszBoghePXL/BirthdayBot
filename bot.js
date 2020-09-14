@@ -13,6 +13,9 @@ client.on("message", async message => {
     if (message.author.bot) return;
 
     switch (message.content.toLowerCase()) {
+        case "testing":
+            test(message);
+            break;
         case "bday set":
             set(message);
             break;
@@ -30,8 +33,16 @@ client.on("message", async message => {
     }
 });
 
+function test(message){
+    message.guild.members.fetch().then(fetchedMembers => {
+        const totalOnline = fetchedMembers.filter(member => member.presence.status === 'online');
+        // We now have a collection with all online member objects in the totalOnline variable
+        message.channel.send(`There are currently ${totalOnline.size} members online in this guild!`);
+    });
+}
+
 function set(message) {
-    message.channel.send(message.author);
+
 }
 
 function next(message) {
