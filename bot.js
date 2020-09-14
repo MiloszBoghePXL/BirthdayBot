@@ -11,10 +11,12 @@ client.on('ready', () => {
 
 client.on("message", async message => {
     if (message.author.bot) return;
+    const embed = new Discord.MessageEmbed();
 
     switch (message.content.toLowerCase()) {
         case "testing":
-            test(message);
+            embed.setTitle("test");
+            test(embed, message);
             break;
         case "bday set":
             set(message);
@@ -33,12 +35,25 @@ client.on("message", async message => {
     }
 });
 
-function test(message) {
-    message.guild.members.fetch().then(fetchedMembers => {
-        const totalOnline = fetchedMembers.filter(member => member.presence.status === 'online');
-        // We now have a collection with all online member objects in the totalOnline variable
-        message.channel.send(`There are currently ${totalOnline.size} members online in this guild!`);
-    });
+function test(embed, message) {
+        embed.setColor('#0099ff')
+        .setTitle('Some title')
+        .setURL('https://discord.js.org/')
+        .setAuthor(message.author.username, message.author.avatar)
+        .setDescription('Some description here')
+        .setThumbnail('https://i.imgur.com/wSTFkRM.png')
+        .addFields(
+            { name: 'Regular field title', value: 'Some value here' },
+            { name: '\u200B', value: '\u200B' },
+            { name: 'Inline field title', value: 'Some value here', inline: true },
+            { name: 'Inline field title', value: 'Some value here', inline: true },
+        )
+        .addField('Inline field title', 'Some value here', true)
+        .setImage('https://i.imgur.com/wSTFkRM.png')
+        .setTimestamp()
+        .setFooter('Some footer text here', 'https://i.imgur.com/wSTFkRM.png');
+
+    message.channel.send(embed);
 }
 
 function set(message) {
