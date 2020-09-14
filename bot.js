@@ -10,39 +10,39 @@ client.on('ready', () => {
 
 
 client.on("message", async message => {
-    if(message.author.bot) return;
+    if (message.author.bot) return;
 
-    switch(message.content.toLowerCase()) {
+    switch (message.content.toLowerCase()) {
         case "bday set":
-
+            set(message);
             break;
         case "bday next":
-
+            next(message);
             break;
         case "bday list":
-
+            list(message);
             break;
         case "bday reset":
-
+            reset(message);
             break;
         default:
             break;
     }
 });
 
-function set(){
+function set(message) {
+    message.channel.send(message.author);
+}
+
+function next(message) {
 
 }
 
-function next(){
+function list(message) {
 
 }
 
-function list(){
-
-}
-
-function reset(){
+function reset(message) {
 
 }
 
