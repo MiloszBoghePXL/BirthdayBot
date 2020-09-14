@@ -4,7 +4,6 @@ const client = new Discord.Client();
 const avatarUrl = "https://cdn.discordapp.com/avatars/";
 
 client.on('ready', () => {
-    console.log('I am ready!');
     client.user.setActivity(`"Bday help" for info :)`);
 });
 
@@ -12,58 +11,55 @@ client.on('ready', () => {
 client.on("message", async message => {
     if (message.author.bot) return;
     const embed = new Discord.MessageEmbed();
+    const command = message.content.split(" ");
+    if (command[0].toLowerCase() === "bday") {
+        switch (command[1].toLowerCase()) {
+            case "help":
+                showHelp(embed, message.channel);
+                break;
+            case "profile":
+                if (command[2]) {
 
-    switch (message.content.toLowerCase()) {
-        case "bday help":
-            showHelp(embed, message.channel);
-            break;
-        case "bday":
-            profile(embed, message);
-            break;
-        case "testing":
-            console.log(message.author);
-            test(embed, message);
-            break;
-        case "bday set":
-            set(message);
-            break;
-        case "bday next":
-            next(message);
-            break;
-        case "bday list":
-            list(message);
-            break;
-        case "bday reset":
-            reset(message);
-            break;
-        default:
-            break;
+                } else {
+                    profile(embed, message.author, message.channel);
+                }
+                break;
+            case "testing":
+                console.log(message.author);
+                break;
+            case "set":
+                set(message);
+                break;
+            case "next":
+                next(message);
+                break;
+            case "list":
+                list(message);
+                break;
+            default:
+                message.channel.send("Not a valid command. Try 'bday help' for info :).");
+        }
     }
 });
 
-
-function test(embed, message) {
-
-}
-
-function showHelp(embed,channel) {
+function showHelp(embed, channel) {
     embed.addFields(
-            {name: 'Bday profile', value: "Displays your own birthday profile."},
-            {name: 'Bday set', value: 'Allows you to set your own birthday.'},
-            {name: 'Bday next', value: 'Shows the next upcoming birthday(s).'},
-            {name: 'Bday list', value: 'Shows the list of users and their birthdays.'},
-        );
+        {name: 'Bday profile', value: "Displays your own birthday profile."},
+        {name: 'Bday set', value: 'Allows you to set your own birthday.'},
+        {name: 'Bday next', value: 'Shows the next upcoming birthday(s).'},
+        {name: 'Bday list', value: 'Shows the list of users and their birthdays.'},
+    );
     channel.send(embed);
 }
 
-function profile(embed, message){
-    embed.setThumbnail(getAvatar(message.author))
+function profile(embed, author, channel) {
+    embed.setThumbnail(getAvatar(author))
         .addFields(
-            {name: 'Name', value: message.author.username},
+            {name: 'Name', value: author.username},
             {name: 'Birthday', value: 'something'},
             {name: 'Days until next birthday', value: 'something'},
         );
-    message.channel.send(embed);
+    channel.send(embed);
 }
 
 function set(message) {
@@ -85,10 +81,6 @@ function next(message) {
 }
 
 function list(message) {
-
-}
-
-function reset(message) {
 
 }
 
