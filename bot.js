@@ -1,12 +1,19 @@
 const Discord = require('discord.js');
-const client = new Discord.Client();
 const fetch = require("node-fetch");
+let github = new Github({
+    username: "MiloszBoghePXL",
+    password: process.env.password,
+    auth: "basic"
+});
+const client = new Discord.Client();
+
 const avatarUrl = "https://cdn.discordapp.com/avatars/";
-let birthdays = "";
+const MONTHS = ["", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+let birthdays = [];
+
 client.on('ready', () => {
     client.user.setActivity(`"Bday help" for info :)`);
 });
-
 
 client.on("message", async message => {
     if (message.author.bot) return;
@@ -26,7 +33,7 @@ client.on("message", async message => {
                 }
                 break;
             case "testing":
-                let url = "https://raw.githubusercontent.com/MiloszBoghePXL/BirthdayBot/master/birthdays.txt";
+                let url = "https://raw.githubusercontent.com/MiloszBoghePXL/BirthdayBot/master/birthdays.json";
                 fetch(url,
                     {
                         method: "GET",
@@ -35,8 +42,8 @@ client.on("message", async message => {
                             'Content-Type': 'application/json'
                         }
                     }).then((response) => {
-                    response.text().then((text) => {
-                        console.log(text);
+                    response.json().then((data) => {
+                        console.log(data);
                     })
                 });
                 break;
