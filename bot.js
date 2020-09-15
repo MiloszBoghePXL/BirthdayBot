@@ -145,7 +145,7 @@ function* getBirthdays() {
     headHash = yield repo.readRef("refs/heads/master");
     commit = yield repo.loadAs("commit", headHash);
     tree = yield repo.loadAs("tree", commit.tree);
-    entry = tree["test.json"];
+    entry = tree["birthdays.json"];
     birthdays = JSON.parse(yield repo.loadAs("text", entry.hash));
     console.log(birthdays);
 }
@@ -155,7 +155,7 @@ function* updateBirthdays() {
         {
             path: "test.json", // Update the existing entry
             mode: entry.mode,  // Preserve the mode
-            content: JSON.stringify(birthdays)
+            content: JSON.stringify(birthdays).replace("\\","")
         }
     ]
 
