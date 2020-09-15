@@ -1,15 +1,59 @@
+let repo = {};
+const githubName = "MiloszBoghePXL/BirthdayBot";
+const gitToken = process.env.github;
 const Discord = require('discord.js');
 const fetch = require("node-fetch");
-let github = new Github({
-    username: "MiloszBoghePXL",
-    password: process.env.password,
-    auth: "basic"
-});
+let run = require("gen-run");
+require('js-github/mixins/github-db')(repo, githubName, gitToken);
+require('js-git/mixins/create-tree')(repo);
+require('js-git/mixins/mem-cache')(repo);
+require('js-git/mixins/read-combiner')(repo);
+require('js-git/mixins/formats')(repo);
+
+run(function* () {
+    let headHash = yield repo.readRef("refs/heads/master");
+    let commit = yield repo.loadAs("commit", headHash);
+    let tree = yield repo.loadAs("tree", commit.tree);
+    let entry = tree["birthdays.json"];
+    let birthdays = yield repo.loadAs("text", entry.hash);
+    console.log(birthdays);
+
+    // Build the updates array
+    let satan = {"id": 217373835303976960, "BirthDate": "27/07/1995"}
+    let updates = [
+        {
+            path: "birthdays.json", // Update the existing entry
+            mode: entry.mode,  // Preserve the mode (it might have been executible)
+            content: JSON.stringify(satan)
+        }
+    ]
+
+// Based on the existing tree, we only want to update, not replace.
+    updates.base = commit.tree;
+
+// Create the new file and the updated tree.
+    let treeHash = yield repo.createTree(updates);
+    let commitHash = yield repo.saveAs("commit", {
+        tree: treeHash,
+        author: {
+            name: "Milosz Boghe",
+            email: "milly.boghe@gmail.com"
+        },
+        parent: headHash,
+        message: "test"
+    });
+
+// Now we can browse to this commit by hash, but it's still not in master.
+// We need to update the ref to point to this new commit.
+
+    yield repo.updateRef("refs/heads/master", commitHash);
+})
+;
+
 const client = new Discord.Client();
 
 const avatarUrl = "https://cdn.discordapp.com/avatars/";
 const MONTHS = ["", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
-let birthdays = [];
 
 client.on('ready', () => {
     client.user.setActivity(`"Bday help" for info :)`);
