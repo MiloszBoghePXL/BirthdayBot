@@ -1,7 +1,8 @@
 const Discord = require('discord.js');
 const client = new Discord.Client();
+const fetch = require("node-fetch");
 const avatarUrl = "https://cdn.discordapp.com/avatars/";
-
+let birthdays = "";
 client.on('ready', () => {
     client.user.setActivity(`"Bday help" for info :)`);
 });
@@ -19,13 +20,25 @@ client.on("message", async message => {
             case "profile":
                 if (command[2]) {
                     let user = message.mentions.users.toJSON()[0];
-                    profile(embed,user,message.channel);
+                    profile(embed, user, message.channel);
                 } else {
                     profile(embed, message.author, message.channel);
                 }
                 break;
             case "testing":
-                console.log(message.author);
+                let url = "https://raw.githubusercontent.com/MiloszBoghePXL/BirthdayBot/master/birthdays.txt";
+                fetch(url,
+                    {
+                        method: "GET",
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'
+                        }
+                    }).then((response) => {
+                    response.text().then((text) => {
+                        console.log(text);
+                    })
+                });
                 break;
             case "set":
                 set(message);
@@ -63,7 +76,7 @@ function profile(embed, author, channel) {
 }
 
 function set(message) {
-    message.channel.send("Hi, " + message.author.username + 'Please enter your birthday. (DD/MM)').then(() => {
+    message.channel.send("Hi, " + message.author.username + '\nPlease enter your birthday. (DD/MM)').then(() => {
         const filter = m => message.author.id === m.author.id;
 
         message.channel.awaitMessages(filter, {time: 60000, max: 1, errors: ['time']})
