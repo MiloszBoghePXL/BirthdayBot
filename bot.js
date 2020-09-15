@@ -1,3 +1,4 @@
+//region init
 let repo = {};
 let birthdays = [];
 let entry = "";
@@ -16,7 +17,6 @@ require('js-git/mixins/read-combiner')(repo);
 require('js-git/mixins/formats')(repo);
 
 const client = new Discord.Client();
-
 const avatarUrl = "https://cdn.discordapp.com/avatars/";
 const MONTHS = ["", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
 
@@ -24,6 +24,7 @@ client.on('ready', () => {
     client.user.setActivity(`"Bday help" for info :)`);
     run(getBirthdays());
 });
+//endregion
 
 client.on("message", async message => {
     if (message.author.bot) return;
@@ -61,19 +62,8 @@ client.on("message", async message => {
     }
 });
 
-function showHelp(embed, channel) {
-    embed.addFields(
-        {name: 'Bday profile (@user optional)', value: "Displays someones birthday profile."},
-        {name: 'Bday set', value: 'Allows you to set your own birthday.'},
-        {name: 'Bday next', value: 'Shows the next upcoming birthday(s).'},
-        {name: 'Bday list', value: 'Shows the list of users and their birthdays.'},
-    );
-    channel.send(embed);
-}
-
 function profile(embed, author, channel) {
-    let birthday = birthdays.find(member=>member.id===parseInt(author.id));
-    console.log(birthday);
+    let birthday = birthdays.find(member=>member.id===parseInt(author.id)).date;
     embed.setThumbnail(getAvatar(author))
         .addFields(
             {name: 'Name', value: author.username},
@@ -83,6 +73,15 @@ function profile(embed, author, channel) {
     channel.send(embed);
 }
 
+function next(embed, author, channel) {
+
+}
+
+function list(embed, author, channel) {
+
+}
+
+//region Done, dont touch
 function set(embed, author, channel) {
     embed.addField('Setting your birthday', "\nHi, " + author.username + '\nPlease enter your birthday in the following format:\n DD/MM/YYYY');
     channel.send(embed).then(() => {
@@ -90,12 +89,12 @@ function set(embed, author, channel) {
     });
 }
 
-function next(embed, author, channel) {
-
-}
-
-function list(embed, author, channel) {
-
+function wrongInput(channel, author) {
+    const embed = new Discord.MessageEmbed();
+    embed.addField("Wrong input", "\nMake sure you use the right format:\n DD/MM/YYYY\nPlease try again :)\n(year can't be greater than current year.");
+    channel.send(embed).then(() => {
+        requestDateInput(channel, author);
+    });
 }
 
 function requestDateInput(channel, author) {
@@ -112,7 +111,7 @@ function requestDateInput(channel, author) {
                 if (exists >= 0) {
                     birthdays.splice(exists, 1);
                 }
-                let entry = {id: parseInt(author.id), BirthDate: date}
+                let entry = {id: parseInt(author.id), date: date}
                 birthdays.push(entry);
                 run(updateBirthdays());
                 embed.addField("Birthday set", `Your birthday is now set on ${date}`);
@@ -121,35 +120,12 @@ function requestDateInput(channel, author) {
         });
 }
 
-function wrongInput(channel, author) {
-    const embed = new Discord.MessageEmbed();
-    embed.addField("Wrong input", "\nMake sure you use the right format:\n DD/MM/YYYY\nPlease try again :)\n(year can't be greater than current year.");
-    channel.send(embed).then(() => {
-        requestDateInput(channel, author);
-    });
-}
-
-function validate(date) {
-    if (!date.match(/[0-9]{2}\/[0-9]{2}\/[0-9]+/g)) return false;
-    let parts = date.split("/");
-    let day = parseInt(parts[0]);
-    let month = parseInt(parts[1]);
-    let year = parseInt(parts[2]);
-    return !(day < 1 || day > 31 || month < 1 || month > 12 || year >= parseInt(new Date().getFullYear().toString()));
-}
-
-
-function getAvatar(author) {
-    return avatarUrl + author.id + "/" + author.avatar + ".png"
-}
-
 function* getBirthdays() {
     headHash = yield repo.readRef("refs/heads/master");
     commit = yield repo.loadAs("commit", headHash);
     tree = yield repo.loadAs("tree", commit.tree);
     entry = tree["birthdays.json"];
     birthdays = JSON.parse(yield repo.loadAs("text", entry.hash));
-    console.log(birthdays);
 }
 
 function* updateBirthdays() {
@@ -180,5 +156,30 @@ function* updateBirthdays() {
     // We need to update the ref to point to this new commit.
     yield repo.updateRef("refs/heads/master", commitHash);
 }
+
+function showHelp(embed, channel) {
+    embed.addFields(
+        {name: 'Bday profile (@user optional)', value: "Displays someones birthday profile."},
+        {name: 'Bday set', value: 'Allows you to set your own birthday.'},
+        {name: 'Bday next', value: 'Shows the next upcoming birthday(s).'},
+        {name: 'Bday list', value: 'Shows the list of users and their birthdays.'},
+    );
+    channel.send(embed);
+}
+
+function validate(date) {
+    if (!date.match(/[0-9]{2}\/[0-9]{2}\/[0-9]+/g)) return false;
+    let parts = date.split("/");
+    let day = parseInt(parts[0]);
+    let month = parseInt(parts[1]);
+    let year = parseInt(parts[2]);
+    return !(day < 1 || day > 31 || month < 1 || month > 12 || year >= parseInt(new Date().getFullYear().toString()));
+}
+
+function getAvatar(author) {
+    return avatarUrl + author.id + "/" + author.avatar + ".png"
+}
+
+//endregion
 
 client.login(process.env.token);
