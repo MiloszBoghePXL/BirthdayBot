@@ -72,10 +72,12 @@ function showHelp(embed, channel) {
 }
 
 function profile(embed, author, channel) {
+    let birthday = birthdays.find(member=>member.id===parseInt(author.id));
+    console.log(birthday);
     embed.setThumbnail(getAvatar(author))
         .addFields(
             {name: 'Name', value: author.username},
-            {name: 'Birthday', value: 'something'},
+            {name: 'Birthday', value: birthday},
             {name: 'Days until next birthday', value: 'something'},
         );
     channel.send(embed);
@@ -153,7 +155,7 @@ function* getBirthdays() {
 function* updateBirthdays() {
     let updates = [
         {
-            path: "test.json", // Update the existing entry
+            path: "birthdays.json", // Update the existing entry
             mode: entry.mode,  // Preserve the mode
             content: JSON.stringify(birthdays).replace("\\","")
         }
