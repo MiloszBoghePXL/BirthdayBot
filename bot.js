@@ -113,7 +113,7 @@ function requestDateInput(channel, author) {
                 channel.send(embed);
                 setTimeout(() => {
                     run(updateBirthdays());
-                }, 60000)
+                }, 3600000)
             }
         });
 }
