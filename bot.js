@@ -220,7 +220,7 @@ function* updateBirthdays() {
     yield repo.updateRef("refs/heads/master", commitHash);
     setTimeout(() => {
         run(updateBirthdays())
-    }, 60000);
+    }, 3600000);
 }
 
 function showHelp(embed, channel) {
