@@ -67,7 +67,8 @@ client.on("message", async message => {
                     break;
                 case "save":
                     if(message.author.id===ownerId){
-                        run(updateBirthdays());
+                        message.channel.send("Saving...");
+                        run(updateBirthdays(message.channel));
                     }
                     break;
                 case "next":
@@ -195,7 +196,7 @@ function* getBirthdays() {
     birthdays = JSON.parse(yield repo.loadAs("text", entry.hash));
 }
 
-function* updateBirthdays() {
+function* updateBirthdays(channel) {
 
     let updates = [
         {
@@ -223,6 +224,7 @@ function* updateBirthdays() {
     // Now we can browse to this commit by hash, but it's still not in master.
     // We need to update the ref to point to this new commit.
     yield repo.updateRef("refs/heads/master", commitHash);
+    channel.send("Data succesfully saved :smile:");
 }
 
 function showHelp(embed, channel) {
