@@ -24,7 +24,7 @@ client.on('ready', () => {
     run(getBirthdays());
     setTimeout(() => {
         run(updateBirthdays());
-    }, 120000)
+    }, 300000)
 });
 
 
