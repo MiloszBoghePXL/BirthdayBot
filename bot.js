@@ -104,6 +104,7 @@ function requestDateInput(channel, author, date) {
     if (date) {
         if (validate(date)) {
             correctInput(embed, author, channel, date);
+            return;
         }else{
             wrongInput(channel,author);
         }
