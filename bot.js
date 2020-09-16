@@ -22,9 +22,6 @@ const avatarUrl = "https://cdn.discordapp.com/avatars/";
 client.on('ready', () => {
     client.user.setActivity(`"Bday help" for info :)`);
     run(getBirthdays());
-    setTimeout(() => {
-        run(updateBirthdays());
-    }, 300000)
 });
 
 
@@ -66,6 +63,11 @@ client.on("message", async message => {
                         requestDateInput(message.channel, message.author, command[2]);
                     } else {
                         set(embed, message.author, message.channel);
+                    }
+                    break;
+                case "save":
+                    if(message.author.id===ownerId){
+                        run(updateBirthdays());
                     }
                     break;
                 case "next":
@@ -140,9 +142,6 @@ function correctInput(embed, author, channel, date) {
     birthdays.push(entry);
     embed.addField("Birthday set", `Your birthday is now set on ${date}`);
     channel.send(embed);
-    setTimeout(() => {
-        run(updateBirthdays());
-    }, 3600000)
 }
 
 function profile(embed, author, channel) {
@@ -224,9 +223,6 @@ function* updateBirthdays() {
     // Now we can browse to this commit by hash, but it's still not in master.
     // We need to update the ref to point to this new commit.
     yield repo.updateRef("refs/heads/master", commitHash);
-    setTimeout(() => {
-        run(updateBirthdays())
-    }, 3600000);
 }
 
 function showHelp(embed, channel) {
