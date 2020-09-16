@@ -168,7 +168,7 @@ function showProfile(embed, author, channel, birthday, days) {
         .addFields(
             {name: 'Name', value: author.username},
             {name: 'Birthday', value: birthday},
-            {name: 'Days until next birthday', value: days},
+            {name: 'Days until next birthday', value: days>0?days:days===0?"Today :partying_face:":"/"},
         );
     channel.send(embed);
 }
