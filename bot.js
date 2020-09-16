@@ -62,7 +62,11 @@ client.on("message", async message => {
                         .then(() => client.login(process.env.token));
                     break;
                 case "set":
-                    set(embed, message.author, message.channel);
+                    if (command[2]) {
+                        requestDateInput(message.channel, message.author, command[2]);
+                    } else {
+                        set(embed, message.author, message.channel);
+                    }
                     break;
                 case "next":
                     next(embed, message.author, message.channel);
@@ -94,9 +98,16 @@ function set(embed, author, channel) {
     });
 }
 
-function requestDateInput(channel, author) {
+function requestDateInput(channel, author, date) {
     const embed = new Discord.MessageEmbed();
     const filter = m => author.id === m.author.id;
+    if (date) {
+        if (validate(date)) {
+            correctInput(embed, author, channel, date);
+        }else{
+            wrongInput(channel,author);
+        }
+    }
     channel.awaitMessages(filter, {time: 60000, max: 1, errors: ['time']})
         .then(messages => {
             let date = messages.first().content;
@@ -105,17 +116,7 @@ function requestDateInput(channel, author) {
             if (!validate(date)) {
                 wrongInput(channel, author)
             } else {
-                let exists = birthdays.findIndex(member => member.id === parseInt(author.id));
-                if (exists >= 0) {
-                    birthdays.splice(exists, 1);
-                }
-                let entry = {id: parseInt(author.id), date: date}
-                birthdays.push(entry);
-                embed.addField("Birthday set", `Your birthday is now set on ${date}`);
-                channel.send(embed);
-                setTimeout(() => {
-                    run(updateBirthdays());
-                }, 3600000)
+                correctInput(embed, author, channel, date);
             }
         });
 }
@@ -126,6 +127,20 @@ function wrongInput(channel, author) {
     channel.send(embed).then(() => {
         requestDateInput(channel, author);
     });
+}
+
+function correctInput(embed, author, channel, date) {
+    let exists = birthdays.findIndex(member => member.id === parseInt(author.id));
+    if (exists >= 0) {
+        birthdays.splice(exists, 1);
+    }
+    let entry = {id: parseInt(author.id), date: date}
+    birthdays.push(entry);
+    embed.addField("Birthday set", `Your birthday is now set on ${date}`);
+    channel.send(embed);
+    setTimeout(() => {
+        run(updateBirthdays());
+    }, 3600000)
 }
 
 function profile(embed, author, channel) {
@@ -209,7 +224,7 @@ function* updateBirthdays() {
 function showHelp(embed, channel) {
     embed.addFields(
         {name: 'Bday profile (@user optional)', value: "Displays someones birthday profile."},
-        {name: 'Bday set', value: 'Allows you to set your own birthday.'},
+        {name: 'Bday set MM/DD/YYYY', value: 'Allows you to set your own birthday.'},
         {name: 'Bday next', value: 'Shows the next upcoming birthday(s).'},
         {name: 'Bday list', value: 'Shows the list of users and their birthdays.'},
     );
