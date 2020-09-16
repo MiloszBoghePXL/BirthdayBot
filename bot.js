@@ -107,6 +107,7 @@ function requestDateInput(channel, author, date) {
             return;
         }else{
             wrongInput(channel,author);
+            return;
         }
     }
     channel.awaitMessages(filter, {time: 60000, max: 1, errors: ['time']})
