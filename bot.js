@@ -1,11 +1,11 @@
 //region init
 let repo = {};
 let birthdays = [];
+let oldBirthdays = "";
 let entry = "";
 let headHash = ""
 let commit = ""
 let tree = ""
-
 const githubName = "MiloszBoghePXL/BirthdayBot";
 const gitToken = process.env.github;
 const Discord = require('discord.js');
@@ -23,9 +23,6 @@ const MONTHS = ["", "January", "February", "March", "April", "May", "June", "Jul
 client.on('ready', () => {
     client.user.setActivity(`"Bday help" for info :)`);
     run(getBirthdays());
-    setTimeout(() => {
-        run(updateBirthdays());
-    }, 120000);
 });
 
 
@@ -67,24 +64,6 @@ client.on("message", async message => {
     }
 });
 
-function profile(embed, author, channel) {
-    let birthday = new Date((birthdays.find(member => member.id === parseInt(author.id)).date));
-    let nextBirthday = new Date(birthday.getFullYear(), birthday.getMonth(), birthday.getDate());
-    let now = new Date();
-    if (now.getMonth() > birthday.getMonth() || (now.getMonth() === birthday.getMonth() && now.getDate() > birthday.getDate())) {
-        nextBirthday.setFullYear(now.getFullYear() + 1);
-    }
-    let time = nextBirthday.getTime() - now.getTime();
-    let days = Math.ceil(time / (1000 * 60 * 60 * 24));
-    embed.setThumbnail(getAvatar(author))
-        .addFields(
-            {name: 'Name', value: author.username},
-            {name: 'Birthday', value: birthday.toLocaleDateString("en-US")},
-            {name: 'Days until next birthday', value: days},
-        );
-    channel.send(embed);
-}
-
 function next(embed, author, channel) {
 
 }
@@ -94,16 +73,9 @@ function list(embed, author, channel) {
 }
 
 //region Done, dont touch
+
 function set(embed, author, channel) {
     embed.addField('Setting your birthday', "\nHi, " + author.username + '\nPlease enter your birthday in the following format:\n MM/DD/YYYY');
-    channel.send(embed).then(() => {
-        requestDateInput(channel, author);
-    });
-}
-
-function wrongInput(channel, author) {
-    const embed = new Discord.MessageEmbed();
-    embed.addField("Wrong input", "\nMake sure you use the right format:\n MM/DD/YYYY\nPlease try again :)\n(year can't be greater than current year.\n\n Write 'stop' to cancel");
     channel.send(embed).then(() => {
         requestDateInput(channel, author);
     });
@@ -128,8 +100,57 @@ function requestDateInput(channel, author) {
                 birthdays.push(entry);
                 embed.addField("Birthday set", `Your birthday is now set on ${date}`);
                 channel.send(embed);
+                setTimeout(() => {
+                    run(updateBirthdays());
+                }, 60000)
             }
         });
+}
+
+function wrongInput(channel, author) {
+    const embed = new Discord.MessageEmbed();
+    embed.addField("Wrong input", "\nMake sure you use the right format:\n MM/DD/YYYY\nPlease try again :)\n(year can't be greater than current year.\n\n Write 'stop' to cancel");
+    channel.send(embed).then(() => {
+        requestDateInput(channel, author);
+    });
+}
+
+function profile(embed, author, channel) {
+    let member = birthdays.find(member => member.id === parseInt(author.id));
+    if (!member) {
+        showProfile(embed, author, channel, "Not set", "/");
+        return;
+    }
+    console.log(member);
+    let birthday = new Date(member.date);
+    let nextBirthday = calcNext(birthday);
+
+    //time to next:
+    let now = new Date();
+    let time = nextBirthday.getTime() - now.getTime();
+    let days = Math.ceil(time / (1000 * 60 * 60 * 24));
+
+    birthday = birthday.toLocaleDateString("en-US");
+    showProfile(embed, author, channel, birthday, days);
+}
+
+function showProfile(embed, author, channel, birthday, days) {
+    embed.setThumbnail(getAvatar(author))
+        .addFields(
+            {name: 'Name', value: author.username},
+            {name: 'Birthday', value: birthday},
+            {name: 'Days until next birthday', value: days},
+        );
+    channel.send(embed);
+}
+
+function calcNext(birthday) {
+    let nextBirthday = new Date(birthday.getFullYear(), birthday.getMonth(), birthday.getDate());
+    let now = new Date();
+    if (now.getMonth() > birthday.getMonth() || (now.getMonth() === birthday.getMonth() && now.getDate() > birthday.getDate())) {
+        nextBirthday.setFullYear(now.getFullYear() + 1);
+    }
+    return nextBirthday;
 }
 
 function* getBirthdays() {
@@ -138,10 +159,14 @@ function* getBirthdays() {
     tree = yield repo.loadAs("tree", commit.tree);
     entry = tree["birthdays.json"];
     birthdays = JSON.parse(yield repo.loadAs("text", entry.hash));
+    oldBirthdays = JSON.stringify(birthdays);
 }
 
 function* updateBirthdays() {
-
+    if (!changes()) {
+        return;
+    }
+    oldBirthdays = JSON.stringify(birthdays);
     let updates = [
         {
             path: "birthdays.json", // Update the existing entry
@@ -162,18 +187,21 @@ function* updateBirthdays() {
             email: "milly.boghe@gmail.com"
         },
         parent: headHash,
-        message: "test"
+        message: "update birthdays.json"
     });
 
     // Now we can browse to this commit by hash, but it's still not in master.
     // We need to update the ref to point to this new commit.
     yield repo.updateRef("refs/heads/master", commitHash);
-    setTimeout(() => {
-        run(updateBirthdays())
-    }, 3600000);
+}
+
+function changes() {
+    let newBirthdays = JSON.stringify(birthdays);
+    return oldBirthdays !== newBirthdays;
 }
 
 function showHelp(embed, channel) {
+    console.log(birthdays);
     embed.addFields(
         {name: 'Bday profile (@user optional)', value: "Displays someones birthday profile."},
         {name: 'Bday set', value: 'Allows you to set your own birthday.'},
