@@ -22,7 +22,9 @@ const avatarUrl = "https://cdn.discordapp.com/avatars/";
 client.on('ready', () => {
     client.user.setActivity(`"Bday help" for info :)`);
     run(getBirthdays());
-    run(updateBirthdays());
+    setTimeout(() => {
+        run(updateBirthdays());
+    }, 120000)
 });
 
 
@@ -199,9 +201,9 @@ function* updateBirthdays() {
     // Now we can browse to this commit by hash, but it's still not in master.
     // We need to update the ref to point to this new commit.
     yield repo.updateRef("refs/heads/master", commitHash);
-    setTimeout(()=>{
+    setTimeout(() => {
         run(updateBirthdays())
-    },60000);
+    }, 60000);
 }
 
 function showHelp(embed, channel) {
