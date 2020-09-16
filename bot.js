@@ -50,14 +50,14 @@ client.on("message", async message => {
                     break;
                 case "shutdown":
                     if (message.author.id !== ownerId) return;
-                    message.channel.send("Shutting down.").then(()=>{
+                    message.channel.send("Shutting down.").then(m=>{
                         client.destroy();
                     });
                     client.destroy();
                     break;
                 case "restart":
                     if (message.author.id !== ownerId) return;
-                    message.channel.send('Restarting...').then(() => {
+                    message.channel.send('Restarting...').then(m => {
                         client.destroy().then(() => {
                             client.login(process.env.token);
                         });
