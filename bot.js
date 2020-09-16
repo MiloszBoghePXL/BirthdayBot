@@ -164,6 +164,7 @@ function profile(embed, author, channel) {
 }
 
 function showProfile(embed, author, channel, birthday, days) {
+    console.log(days);
     embed.setThumbnail(getAvatar(author))
         .addFields(
             {name: 'Name', value: author.username},
