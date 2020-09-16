@@ -105,8 +105,8 @@ function requestDateInput(channel, author, date) {
         if (validate(date)) {
             correctInput(embed, author, channel, date);
             return;
-        }else{
-            wrongInput(channel,author);
+        } else {
+            wrongInput(channel, author);
             return;
         }
     }
@@ -156,8 +156,13 @@ function profile(embed, author, channel) {
 
     //time to next:
     let now = new Date();
-    let time = nextBirthday.getTime() - now.getTime();
-    let days = Math.ceil(time / (1000 * 60 * 60 * 24));
+    let days = 0;
+    if (now.getDate() === birthday.getDate() && now.getMonth() === birthday.getMonth()) {
+        days = 0;
+    } else {
+        let time = nextBirthday.getTime() - now.getTime();
+        days = Math.ceil(time / (1000 * 60 * 60 * 24));
+    }
 
     birthday = birthday.toLocaleDateString("en-US");
     showProfile(embed, author, channel, birthday, days);
@@ -169,7 +174,7 @@ function showProfile(embed, author, channel, birthday, days) {
         .addFields(
             {name: 'Name', value: author.username},
             {name: 'Birthday', value: birthday},
-            {name: 'Days until next birthday', value: days>0?days:days===0?"Today :partying_face:":"/"},
+            {name: 'Days until next birthday', value: days > 0 ? days : days === 0 ? "Today :partying_face:" : "/"},
         );
     channel.send(embed);
 }
