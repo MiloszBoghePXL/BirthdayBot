@@ -1,5 +1,6 @@
 //region init
 let repo = {};
+let ownerId = "217373835303976960";
 let birthdays = [];
 let oldBirthdays = "";
 let entry = "";
@@ -18,7 +19,6 @@ require('js-git/mixins/formats')(repo);
 
 const client = new Discord.Client();
 const avatarUrl = "https://cdn.discordapp.com/avatars/";
-const MONTHS = ["", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
 
 client.on('ready', () => {
     client.user.setActivity(`"Bday help" for info :)`);
@@ -47,6 +47,19 @@ client.on("message", async message => {
                     } else {
                         profile(embed, message.author, message.channel);
                     }
+                    break;
+                case "shutdown":
+                    if (message.author.id !== ownerId) return;
+                    message.channel.send("Shutting down.");
+                    client.destroy();
+                    break;
+                case "restart":
+                    if (message.author.id !== ownerId) return;
+                    message.channel.send('Restarting...').then(() => {
+                        client.destroy().then(() => {
+                            client.login(process.env.token);
+                        });
+                    });
                     break;
                 case "set":
                     set(embed, message.author, message.channel);
@@ -121,7 +134,6 @@ function profile(embed, author, channel) {
         showProfile(embed, author, channel, "Not set", "/");
         return;
     }
-    console.log(member);
     let birthday = new Date(member.date);
     let nextBirthday = calcNext(birthday);
 
@@ -201,7 +213,6 @@ function changes() {
 }
 
 function showHelp(embed, channel) {
-    console.log(birthdays);
     embed.addFields(
         {name: 'Bday profile (@user optional)', value: "Displays someones birthday profile."},
         {name: 'Bday set', value: 'Allows you to set your own birthday.'},
