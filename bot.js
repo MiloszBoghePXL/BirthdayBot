@@ -217,7 +217,7 @@ function showHelp(embed, channel) {
 }
 
 function validate(date) {
-    if (!date.match(/[0-9]{2}\/[0-9]{2}\/[0-9]+/g)) return false;
+    if (!date.match(/[0-9]{1,2}\/[0-9]{1,2}\/[0-9]+/g)) return false;
     let parts = date.split("/");
     let month = parseInt(parts[0]);
     let day = parseInt(parts[1]);
