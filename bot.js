@@ -2,7 +2,6 @@
 let repo = {};
 let ownerId = "217373835303976960";
 let birthdays = [];
-let oldBirthdays = "";
 let entry = "";
 let headHash = ""
 let commit = ""
@@ -23,6 +22,7 @@ const avatarUrl = "https://cdn.discordapp.com/avatars/";
 client.on('ready', () => {
     client.user.setActivity(`"Bday help" for info :)`);
     run(getBirthdays());
+    run(updateBirthdays());
 });
 
 
@@ -169,14 +169,10 @@ function* getBirthdays() {
     tree = yield repo.loadAs("tree", commit.tree);
     entry = tree["birthdays.json"];
     birthdays = JSON.parse(yield repo.loadAs("text", entry.hash));
-    oldBirthdays = JSON.stringify(birthdays);
 }
 
 function* updateBirthdays() {
-    if (!changes()) {
-        return;
-    }
-    oldBirthdays = JSON.stringify(birthdays);
+
     let updates = [
         {
             path: "birthdays.json", // Update the existing entry
@@ -203,11 +199,9 @@ function* updateBirthdays() {
     // Now we can browse to this commit by hash, but it's still not in master.
     // We need to update the ref to point to this new commit.
     yield repo.updateRef("refs/heads/master", commitHash);
-}
-
-function changes() {
-    let newBirthdays = JSON.stringify(birthdays);
-    return oldBirthdays !== newBirthdays;
+    setTimeout(()=>{
+        run(updateBirthdays())
+    },60000);
 }
 
 function showHelp(embed, channel) {
