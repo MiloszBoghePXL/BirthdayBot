@@ -27,6 +27,17 @@ client.on('ready', () => {
 
 //endregion
 
+
+
+function next(embed, author, channel) {
+
+}
+
+function list(embed, author, channel) {
+
+}
+
+//region Done, dont touch
 client.on("message", async message => {
     if (message.author.bot) return;
     const embed = new Discord.MessageEmbed();
@@ -84,15 +95,6 @@ client.on("message", async message => {
     }
 });
 
-function next(embed, author, channel) {
-
-}
-
-function list(embed, author, channel) {
-
-}
-
-//region Done, dont touch
 
 function set(embed, author, channel) {
     embed.addField('Setting your birthday', "\nHi, " + author.username + '\nPlease enter your birthday in the following format:\n MM/DD/YYYY');
@@ -253,7 +255,6 @@ function getAvatar(author) {
     return avatarUrl + author.id + "/" + author.avatar + ".png"
 }
 
+client.login(process.env.token);
 
 //endregion
-
-client.login(process.env.token);
