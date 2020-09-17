@@ -143,6 +143,7 @@ function correctInput(embed, author, channel, date) {
     birthdays.push(entry);
     embed.addField("Birthday set", `Your birthday is now set on ${date}`);
     channel.send(embed);
+    run(updateBirthdays());
 }
 
 function profile(embed, author, channel) {
@@ -207,6 +208,9 @@ function* updateBirthdays(channel) {
     ]
 
     // Based on the existing tree, we only want to update, not replace.
+    headHash = yield repo.readRef("refs/heads/master");
+    commit = yield repo.loadAs("commit", headHash);
+    tree = yield repo.loadAs("tree", commit.tree);
     updates.base = commit.tree;
 
     // Create the new file and the updated tree.
@@ -224,7 +228,6 @@ function* updateBirthdays(channel) {
     // Now we can browse to this commit by hash, but it's still not in master.
     // We need to update the ref to point to this new commit.
     yield repo.updateRef("refs/heads/master", commitHash);
-    channel.send("Data succesfully saved :smile:");
 }
 
 function showHelp(embed, channel) {
