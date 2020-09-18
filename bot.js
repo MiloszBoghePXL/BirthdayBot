@@ -30,11 +30,31 @@ client.on('ready', () => {
 
 function next(embed, channel) {
     let now = new Date();
-    let nextBirthday = birthdays.sort(entry => calcNext(new Date(entry.date), now))[0];
-    console.log(nextBirthday);
-    console.log(daysLeft(new Date(nextBirthday.date).setFullYear(now.getFullYear()),now));
-    embed.addField('Next Birthday', "test");
-    embed.addField('People', "test");
+    let nextBirthdays = birthdays.map(entry => {
+        return {name: entry.name, date: calcNext(new Date(entry.date), now)}
+    }).map(entry => {
+        return {name: entry.name, date: entry.date.toLocaleDateString("en-US"), daysLeft: daysLeft(entry.date, now)}
+    });
+
+    let min = 366;
+    let nextPeople = [];
+    let names = "";
+    for (let i = 0; i < nextBirthdays.length; i++) {
+        if (nextBirthdays[i].daysLeft < min) {
+            min = nextBirthdays[i].daysLeft;
+        }
+    }
+
+    for (let i = 0; i < nextBirthdays.length; i++) {
+        if (nextBirthdays[i].daysLeft === min) {
+            nextPeople.push(nextBirthdays[i]);
+            names += nextBirthdays[i].name + "\n";
+        }
+    }
+    embed.setThumbnail("https://hotemoji.com/images/dl/z/partying-face-emoji-by-twitter.png");
+    embed.addField('Next Birthday', nextPeople[0].date);
+    embed.addField('Days left', nextPeople[0].daysLeft);
+    embed.addField('People', names);
     channel.send(embed);
 }
 
@@ -171,13 +191,11 @@ function profile(embed, author, channel) {
 }
 
 function daysLeft(nextBirthday, now) {
-    console.log(nextBirthday);
-    let time = nextBirthday - now.getTime();
+    let time = nextBirthday - now;
     return Math.ceil(time / (1000 * 60 * 60 * 24));
 }
 
 function showProfile(embed, author, channel, birthday, days) {
-    console.log(days);
     embed.setThumbnail(getAvatar(author))
         .addFields(
             {name: 'Name', value: author.username},
