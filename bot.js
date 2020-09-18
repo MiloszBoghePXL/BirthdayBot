@@ -28,12 +28,19 @@ client.on('ready', () => {
 //endregion
 
 
-function next(embed, author, channel) {
-
+function next(embed, channel) {
+    let now = new Date();
+    let nextBirthday = birthdays.sort(entry => calcNext(new Date(entry.date), now))[0];
+    console.log(nextBirthday);
+    console.log(daysLeft(new Date(nextBirthday.date).setFullYear(now.getFullYear()),now));
+    embed.addField('Next Birthday', "test");
+    embed.addField('People', "test");
+    channel.send(embed);
 }
 
-function list(embed, author, channel) {
-
+function list(embed, channel) {
+    embed.addField('Next Birthday', "");
+    embed.addField('People', "");
 }
 
 //region Done, dont touch
@@ -82,10 +89,10 @@ client.on("message", async message => {
                     }
                     break;
                 case "next":
-                    next(embed, message.author, message.channel);
+                    next(embed, message.channel);
                     break;
                 case "list":
-                    list(embed, message.author, message.channel);
+                    list(embed, message.channel);
                     break;
                 default:
                     message.channel.send("Not a valid command. Try 'bday help' for info :).");
@@ -140,7 +147,7 @@ function correctInput(embed, author, channel, date) {
     if (exists >= 0) {
         birthdays.splice(exists, 1);
     }
-    let entry = {id: parseInt(author.id), date: date}
+    let entry = {id: parseInt(author.id), name: author.username, date: date}
     birthdays.push(entry);
     embed.addField("Birthday set", `Your birthday is now set on ${date}`);
     channel.send(embed);
@@ -157,20 +164,16 @@ function profile(embed, author, channel) {
 
     //time to next:
     let now = new Date();
-    let days = 0;
-    if (now.getDate() === birthday.getDate() && now.getMonth() === birthday.getMonth()) {
-        days = 0;
-    } else {
-        let nextBirthday = calcNext(birthday);
-        console.log(nextBirthday.toLocaleDateString("en-US"));
-        console.log(nextBirthday.getTime());
-        console.log(now.getTime());
-        let time = nextBirthday.getTime() - now.getTime();
-        days = Math.ceil(time / (1000 * 60 * 60 * 24));
-    }
-
+    let nextBirthday = calcNext(birthday, now);
+    let days = daysLeft(nextBirthday, now);
     birthday = birthday.toLocaleDateString("en-US");
     showProfile(embed, author, channel, birthday, days);
+}
+
+function daysLeft(nextBirthday, now) {
+    console.log(nextBirthday);
+    let time = nextBirthday - now.getTime();
+    return Math.ceil(time / (1000 * 60 * 60 * 24));
 }
 
 function showProfile(embed, author, channel, birthday, days) {
@@ -184,8 +187,10 @@ function showProfile(embed, author, channel, birthday, days) {
     channel.send(embed);
 }
 
-function calcNext(birthday) {
-    let now = new Date();
+function calcNext(birthday, now) {
+    if (now.getDate() === birthday.getDate() && now.getMonth() === birthday.getMonth()) {
+        return now;
+    }
     let nextBirthday = new Date(now.getFullYear(), birthday.getMonth(), birthday.getDate());
     if (now.getMonth() > birthday.getMonth() || (now.getMonth() === birthday.getMonth() && now.getDate() >= birthday.getDate())) {
         nextBirthday.setFullYear(now.getFullYear() + 1);
