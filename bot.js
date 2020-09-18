@@ -20,13 +20,12 @@ const client = new Discord.Client();
 const avatarUrl = "https://cdn.discordapp.com/avatars/";
 
 client.on('ready', () => {
-    client.user.setActivity(`"Bday help" for info :)`);
+    client.user.setActivity(`"Bday" for info :)`);
     run(getBirthdays());
 });
 
 
 //endregion
-
 
 
 function next(embed, author, channel) {
@@ -77,7 +76,7 @@ client.on("message", async message => {
                     }
                     break;
                 case "save":
-                    if(message.author.id===ownerId){
+                    if (message.author.id === ownerId) {
                         message.channel.send("Saving...");
                         run(updateBirthdays(message.channel));
                     }
@@ -155,7 +154,6 @@ function profile(embed, author, channel) {
         return;
     }
     let birthday = new Date(member.date);
-    let nextBirthday = calcNext(birthday);
 
     //time to next:
     let now = new Date();
@@ -163,6 +161,10 @@ function profile(embed, author, channel) {
     if (now.getDate() === birthday.getDate() && now.getMonth() === birthday.getMonth()) {
         days = 0;
     } else {
+        let nextBirthday = calcNext(birthday);
+        console.log(nextBirthday.toLocaleDateString("en-US"));
+        console.log(nextBirthday.getTime());
+        console.log(now.getTime());
         let time = nextBirthday.getTime() - now.getTime();
         days = Math.ceil(time / (1000 * 60 * 60 * 24));
     }
@@ -183,9 +185,9 @@ function showProfile(embed, author, channel, birthday, days) {
 }
 
 function calcNext(birthday) {
-    let nextBirthday = new Date(birthday.getFullYear(), birthday.getMonth(), birthday.getDate());
     let now = new Date();
-    if (now.getMonth() > birthday.getMonth() || (now.getMonth() === birthday.getMonth() && now.getDate() > birthday.getDate())) {
+    let nextBirthday = new Date(now.getFullYear(), birthday.getMonth(), birthday.getDate());
+    if (now.getMonth() > birthday.getMonth() || (now.getMonth() === birthday.getMonth() && now.getDate() >= birthday.getDate())) {
         nextBirthday.setFullYear(now.getFullYear() + 1);
     }
     return nextBirthday;
