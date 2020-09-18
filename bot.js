@@ -51,13 +51,15 @@ function next(embed, channel) {
             names += nextBirthdays[i].name + "\n";
         }
     }
-    let nextDate = "";
+    let nextDate = new Date(nextPeople[0].date);
 
-    if (nextPeople[0].date.getMonth() === now.getMonth() && nextPeople[0].date.getDate() === now.getDate()) {
+    if (nextDate.getMonth() === now.getMonth() && nextDate.getDate() === now.getDate()) {
         nextDate = "Today :partying_face:"
+    } else {
+        nextDate = nextPeople[0].date;
     }
     embed.setThumbnail("https://hotemoji.com/images/dl/z/partying-face-emoji-by-twitter.png");
-    embed.addField('Next Birthday', nextDate);
+    embed.addField('Next Birthday', typeof(nextDate)==="string"?nextDate:nextDate.toLocaleDateString("en-US"));
     embed.addField('Days left', nextPeople[0].daysLeft);
     embed.addField('User(s)', names);
     channel.send(embed);
