@@ -51,9 +51,9 @@ function next(embed, channel) {
             names += nextBirthdays[i].name + "\n";
         }
     }
-    let nextDate = nextPeople[0].date;
+    let nextDate = "";
 
-    if (nextDate.getMonth() === now.getMonth() && nextDate.getDate() === now.getDate()) {
+    if (nextPeople[0].date.getMonth() === now.getMonth() && nextPeople[0].date.getDate() === now.getDate()) {
         nextDate = "Today :partying_face:"
     }
     embed.setThumbnail("https://hotemoji.com/images/dl/z/partying-face-emoji-by-twitter.png");
