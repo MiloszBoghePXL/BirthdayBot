@@ -1,5 +1,6 @@
 //region init
 const moment = require("moment");
+const cron = require("node-cron");
 const Pagination = require('discord-paginationembed');
 const Discord = require('discord.js');
 const githubName = "MiloszBoghePXL/BirthdayBot";
@@ -28,19 +29,19 @@ require('js-git/mixins/formats')(repo);
 client.on('ready', () => {
     client.user.setActivity(`"Bday" for info :)`);
     run(getBirthdays());
+    let channel = client.channels.cache.get("480124306181849100");
+    cron.schedule("* * 13 * * *", () => {
+        channel.send("<@"+ownerId+">, it worked :)" )
+    }, {
+        scheduled: true,
+        timezone: "America/Sao_Paulo"
+    });
 });
 
 //endregion
 
 
 //region Done, dont touch
-
-function check(channel) {
-    next(channel);
-    setTimeout(() => {
-        check(channel)
-    }, 60000*60*24);
-}
 
 client.on("message", async message => {
     if (message.author.bot) return;
@@ -69,7 +70,6 @@ client.on("message", async message => {
                     break;
                 case "check":
                     if (message.author.id !== ownerId) return;
-                    check(message.channel);
                     break;
                 case "restart":
                     if (message.author.id !== ownerId) return;
