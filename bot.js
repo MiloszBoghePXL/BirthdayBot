@@ -30,7 +30,7 @@ client.on('ready', () => {
     client.user.setActivity(`"Bday" for info :)`);
     run(getBirthdays());
     let channel = client.channels.cache.get("480124306181849100");
-    cron.schedule("* * 13 * * *", () => {
+    cron.schedule("0 0 13 * * *", () => {
         channel.send("<@"+ownerId+">, it worked :)" )
     }, {
         scheduled: true,
