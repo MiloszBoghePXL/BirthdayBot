@@ -46,6 +46,7 @@ client.on('ready', () => {
 client.on("message", async message => {
     if (message.author.bot) return;
     const embed = new Discord.MessageEmbed();
+    embed.setDescription("-----------------------------");
     if (message.content.toLowerCase() === "bday") {
         showHelp(embed, message.channel)
     } else {
