@@ -30,7 +30,7 @@ client.on('ready', () => {
     client.user.setActivity(`"Bday" for info :)`);
     run(getBirthdays());
     let channel = client.channels.cache.get("480124306181849100");
-    cron.schedule("* * 13 * * *", () => {
+    cron.schedule("0 0 10 * * *", () => {
         channel.send("<@"+ownerId+">, it worked :)" )
     }, {
         scheduled: true,
@@ -67,9 +67,6 @@ client.on("message", async message => {
                     if (message.author.id !== ownerId) return;
                     message.channel.send("Shutting down.")
                         .then(() => client.destroy());
-                    break;
-                case "check":
-                    if (message.author.id !== ownerId) return;
                     break;
                 case "restart":
                     if (message.author.id !== ownerId) return;
