@@ -85,12 +85,19 @@ client.on("message", async message => {
                 case "next":
                     nextSend(embed, message.channel);
                     break;
+                case "test":
+                    test(message.channel);
+                    break;
                 default:
-                    message.channel.send("Not a valid command. Try 'bday help' for info :).");
+                    break;
             }
         }
     }
 });
+
+function test(channel) {
+    next(channel);
+}
 
 function set(embed, author, channel) {
     embed.addField('Setting your birthday', "\nHi, " + author.username + '\nPlease enter your birthday in the following format:\n MM/DD');
@@ -176,7 +183,7 @@ function next(channel) {
             ids += "<@" + entry.id + ">" + " ";
         }
     })
-
+    console.log(next);
     if (next.daysLeft === 0) {
         announce(channel, ids);
         return;
@@ -198,9 +205,18 @@ function nextSend(embed, channel) {
 }
 
 function announce(channel, ids) {
-    channel.send("Today: " + ids +
-        "\nHappy birthday! :partying_face:"
-    );
+    let fireworks =
+        ":fireworks::fireworks::fireworks::fireworks::fireworks:\n" +
+        ":fireworks::fireworks::fireworks::fireworks::fireworks:\n" +
+        ":fireworks::fireworks::fireworks::fireworks::fireworks:\n" +
+        ":fireworks::fireworks::fireworks::fireworks::fireworks:\n"
+    channel.send(fireworks).then(() => {
+        channel.send("Today: " + ids +
+            "\nHappy birthday! :partying_face:"
+        ).then(() => {
+            channel.send(fireworks);
+        })
+    });
 }
 
 function profile(embed, author, channel) {
