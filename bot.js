@@ -293,11 +293,12 @@ function* updateBirthdays() {
 }
 
 function showHelp(embed, channel) {
-    embed.addFields(
-        {name: 'Bday profile (@user optional)', value: "Displays someones birthday profile."},
-        {name: 'Bday set MM/DD', value: 'Allows you to set your own birthday.'},
-        {name: 'Bday next', value: 'Shows the next upcoming birthday(s).'},
-    );
+    embed.setThumbnail("https://www.pngkey.com/png/full/12-125599_question-mark-png-blue-question-mark.png")
+        .addFields(
+            {name: 'Bday profile (@user optional)', value: "Displays someones birthday profile."},
+            {name: 'Bday set MM/DD', value: 'Allows you to set your own birthday.'},
+            {name: 'Bday next', value: 'Shows the next upcoming birthday(s).'},
+        );
     channel.send(embed);
 }
 
