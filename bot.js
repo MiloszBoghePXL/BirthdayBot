@@ -297,7 +297,6 @@ function showHelp(embed, channel) {
         {name: 'Bday profile (@user optional)', value: "Displays someones birthday profile."},
         {name: 'Bday set MM/DD', value: 'Allows you to set your own birthday.'},
         {name: 'Bday next', value: 'Shows the next upcoming birthday(s).'},
-        {name: 'Bday list', value: 'Shows the list of users and their birthdays.'},
     );
     channel.send(embed);
 }
