@@ -1,7 +1,6 @@
 //region init
 const moment = require("moment");
 const cron = require("node-cron");
-const Pagination = require('discord-paginationembed');
 const Discord = require('discord.js');
 const githubName = "MiloszBoghePXL/BirthdayBot";
 const avatarUrl = "https://cdn.discordapp.com/avatars/";
@@ -9,6 +8,7 @@ const gitToken = process.env.github;
 const client = new Discord.Client();
 let repo = {};
 let ownerId = "217373835303976960";
+let nella = "470350669283328000";
 let birthdays = [];
 let entry = "";
 let headHash = ""
@@ -76,7 +76,14 @@ client.on("message", async message => {
                         .then(() => client.login(process.env.token));
                     break;
                 case "set":
-                    if (command[2]) {
+                    let user = message.mentions.users.toJSON()[0];
+                    if (user) {
+                        if (message.author.id === nella) {
+                            requestDateInput(message.channel, user, command[3])
+                        } else {
+                            message.channel.send("I don't take orders from you!");
+                        }
+                    } else if (command[2]) {
                         requestDateInput(message.channel, message.author, command[2]);
                     } else {
                         set(embed, message.author, message.channel);
@@ -138,7 +145,7 @@ function correctInput(embed, author, channel, date) {
     }
     let entry = {id: parseInt(author.id), name: author.username, date: date}
     birthdays.push(entry);
-    embed.addField("Birthday set", `Your birthday is now set on ${moment(date + "/" + moment().year(), format).format(formath)}`);
+    embed.addField("Birthday set", author.username + `'s birthday is now set on ${moment(date + "/" + moment().year(), format).format(formath)}`);
     channel.send(embed);
     run(updateBirthdays());
 }
