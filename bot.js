@@ -78,7 +78,7 @@ client.on("message", async message => {
                 case "set":
                     let user = message.mentions.users.toJSON()[0];
                     if (user) {
-                        if (message.author.id === nella) {
+                        if (message.author.id === nella || message.author.id === user.id) {
                             requestDateInput(message.channel, user, command[3])
                         } else {
                             message.channel.send("I don't take orders from you!");
@@ -190,7 +190,6 @@ function next(channel) {
             ids += "<@" + entry.id + ">" + " ";
         }
     })
-    console.log(next);
     if (next.daysLeft === 0) {
         announce(channel, ids);
         return;
