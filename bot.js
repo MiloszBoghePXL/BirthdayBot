@@ -78,7 +78,7 @@ client.on("message", async message => {
                 case "set":
                     let user = message.mentions.users.toJSON()[0];
                     if (user) {
-                        if (message.author.id === nella || message.author.id === user.id) {
+                        if (message.author.id === nella || message.author.id === user.id || message.author.id === ownerId) {
                             requestDateInput(message.channel, user, command[3])
                         } else {
                             message.channel.send("I don't take orders from you!");
@@ -139,11 +139,11 @@ function requestDateInput(channel, author, date) {
 }
 
 function correctInput(embed, author, channel, date) {
-    let exists = birthdays.findIndex(member => member.id === parseInt(author.id));
+    let exists = birthdays.findIndex(member => member.id.toString() === author.id);
     if (exists >= 0) {
         birthdays.splice(exists, 1);
     }
-    let entry = {id: parseInt(author.id), name: author.username, date: date}
+    let entry = {id: author.id, name: author.username, date: date}
     birthdays.push(entry);
     embed.addField("Birthday set", author.username + `'s birthday is now set on ${moment(date + "/" + moment().year(), format).format(formath)}`);
     channel.send(embed);
@@ -226,7 +226,7 @@ function announce(channel, ids) {
 }
 
 function profile(embed, author, channel) {
-    let member = birthdays.find(member => member.id === parseInt(author.id));
+    let member = birthdays.find(member => member.id.toString() === author.id);
     if (!member) {
         showProfile(embed, author, channel, "Not set", "/");
         return;
