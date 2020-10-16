@@ -219,9 +219,13 @@ function today(channel) {
         let date = moment(b.date, format);
         if (date.format(format) === moment().format(format)) ids.push(b.id);
     })
+    if (ids.length === 0) {
+        channel.send("No birthdays today :frowning:");
+        return;
+    }
     let users = "";
-    ids.forEach(id=>{
-        users+="<@"+id+"> "
+    ids.forEach(id => {
+        users += "<@" + id + "> "
     })
     announce(channel, users);
 }
