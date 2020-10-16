@@ -2,22 +2,28 @@
 const moment = require("moment");
 const cron = require("node-cron");
 const Discord = require('discord.js');
-const githubName = "MiloszBoghePXL/BirthdayBot";
 const avatarUrl = "https://cdn.discordapp.com/avatars/";
-const gitToken = process.env.github;
 const client = new Discord.Client();
-let repo = {};
+let birthdays = [];
+//id's
 let ownerId = "217373835303976960";
 let nella = "470350669283328000";
-let birthdays = [];
+
+//git stuff
+const githubName = "MiloszBoghePXL/BirthdayBot";
+const gitToken = process.env.github;
+let repo = {};
 let entry = "";
 let headHash = ""
 let commit = ""
 let tree = ""
-let format = "MM/DD/YYYY";
-let formath = "MMMM Do";
+
+//date stuff
+const format = "MM/DD/YYYY";
+const formath = "MMMM Do";
 let currentYear = moment().year();
 let nextYear = currentYear + 1;
+
 let run = require("gen-run");
 require('js-github/mixins/github-db')(repo, githubName, gitToken);
 require('js-git/mixins/create-tree')(repo);
@@ -31,7 +37,7 @@ client.on('ready', () => {
     run(getBirthdays());
     let channel = client.channels.cache.get("480124306181849100");
     cron.schedule("0 0 10 * * *", () => {
-        next(channel);
+        today(channel);
     }, {
         scheduled: true,
         timezone: "America/Sao_Paulo"
@@ -91,6 +97,9 @@ client.on("message", async message => {
                     break;
                 case "next":
                     nextSend(embed, message.channel);
+                    break;
+                case "today":
+                    today(message.channel);
                     break;
                 case "test":
                     test(message.channel);
@@ -170,7 +179,7 @@ function getList() {
     });
 }
 
-function next(channel) {
+function next() {
     let temp = getList();
 
     //find the closest birthday:
@@ -178,22 +187,16 @@ function next(channel) {
     temp.forEach(entry => {
         let min = next.daysLeft;
         let days = entry.daysLeft;
-        days < min ? next = entry : null;
+        days < min && days > 0 ? next = entry : null;
     })
 
     //find all users with this birthday:
     let users = "";
-    let ids = ""
     temp.forEach(entry => {
         if (entry.date === next.date) {
             users += "\n" + entry.name;
-            ids += "<@" + entry.id + ">" + " ";
         }
     })
-    if (next.daysLeft === 0) {
-        announce(channel, ids);
-        return;
-    }
     return {next: next, users: users};
 
 }
@@ -208,6 +211,19 @@ function nextSend(embed, channel) {
         embed.addField('User(s)', upcoming.users);
         channel.send(embed);
     }
+}
+
+function today(channel) {
+    let ids = [];
+    birthdays.find(b => {
+        let date = moment(b.date, format);
+        if (date.format(format) === moment().format(format)) ids.push(b.id);
+    })
+    let users = "";
+    ids.forEach(id=>{
+        users+="<@"+id+"> "
+    })
+    announce(channel, users);
 }
 
 function announce(channel, ids) {
